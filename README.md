@@ -1,2 +1,2 @@
-# course
-coding in courses
+# QuantCourse
+Learn Quant at different levels.
