@@ -1,0 +1,32 @@
+idea:
+  original: "最近具身智能概念很火，跟着趋势买，涨了就拿跌了就跑。"
+  type: "自上而下"
+  summary: "跟随具身智能概念热度进行趋势交易，涨持跌卖。"
+logic_chain:
+  premise_layer:
+    - id: "P1"
+      proposition: "最近具身智能概念在A股市场的关注度和热度显著上升。"
+      verifiable: true
+      verification_method: "查询近1个月同花顺/东方财富具身智能概念指数涨幅、成交额、换手率及新闻/研报提及频次。"
+  industry_layer:
+    - id: "I1"
+      proposition: "具身智能概念热度上升带动机器人、传感器、AI算法等相关产业链板块表现。"
+      verifiable: true
+      verification_method: "比对具身智能概念指数与机器人、自动化设备等相关行业指数近1个月相关性及资金流向。"
+  stock_layer:
+    - id: "S1"
+      proposition: "用户未指定具体个股，无法验证个股层面是否具备与概念热度匹配的基本面或趋势特征。"
+      verifiable: false
+      verification_method: "无法通过公开数据验证，需用户补充具体标的。"
+target:
+  stock: "未明确"
+  industry: "具身智能/机器人"
+  style: "事件驱动"
+user_specified_rules:
+  - "上涨时继续持有，下跌时卖出（趋势跟随规则）"
+missing_info:
+  - "具体标的股票/代码未提及"
+  - "买入触发条件或时机未提及"
+  - "仓位大小/资金管理规则未提及"
+  - "持有周期/最长持仓时间未提及"
+  - "止盈止损的具体幅度未提及（仅提及涨拿跌跑）"
