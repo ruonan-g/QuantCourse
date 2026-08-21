@@ -1,0 +1,79 @@
+strategy_name: "具身智能板块趋势跟随策略（涨拿跌跑）"
+source_idea: "具身智能概念热度上升，买入机器人、传感器、AI算法等产业链相关标的，涨了就拿跌了就跑。"
+
+can_quantify: true
+sector_level: true
+blocking_reason: ""
+required_inputs: []
+
+backtest_window:
+  start: "2023-05-22"
+  end: "2026-05-22"
+  alignment: "generic"
+  note: "近3年通用窗口，未对齐想法，锚定行情数据最新日2026-05-22；想法为趋势跟随型且无固定持有周期，禁止使用催化剂前6个月窗口。"
+
+stock_pool:
+  primary: "具身智能/人形机器人板块等权篮子"
+  alternatives: ["三花智控", "绿的谐波", "拓普集团", "鸣志电器", "汇川技术"]
+  source: "assumption"
+  note: "板块级回测，以 alternatives 构建等权篮子；用户未指定具体个股，故用行业内真实 A 股龙头近似暴露，具体代码映射由 E 通过 industry_clean.csv 完成。"
+
+buy_trigger:
+  condition: "组合净值收盘价上穿20日均线（MA20）"
+  rationale: "基于 SuperMind 示例中 5日均线上穿20日均线作为买入信号，以及 BigQuant 多头排列均线策略，均线交叉是趋势跟随型策略的常用右侧买入条件；本想法'涨了就拿'本质为趋势跟踪，采用组合净值上穿20日均线作为入场信号。"
+  source: "web_experience"
+  evidence_source:
+    source_name: "回测引擎 - SuperMind - 同花顺"
+    source_url: "https://quant.10jqka.com.cn/view/help/12"
+    query_used: "回测 买入条件 技术指标 主观多头 A股"
+
+sell_trigger:
+  condition: "组合净值收盘价下穿20日均线（MA20）"
+  rationale: "基于 SuperMind 示例中 5日均线下穿20日均线作为卖出信号，趋势跟踪型策略以均线死叉离场，避免趋势反转；对应本想法'跌了就跑'。"
+  source: "web_experience"
+  evidence_source:
+    source_name: "回测引擎 - SuperMind - 同花顺"
+    source_url: "https://quant.10jqka.com.cn/view/help/12"
+    query_used: "回测 卖出条件 技术指标 主观多头 A股"
+
+holding_period:
+  duration: "最长4个季度（季度调仓）"
+  rebalance_freq: "quarterly"
+  source: "assumption"
+  rationale: "静态默认值：中期策略默认季度调仓、最长4期；此处仅表示权重再平衡节奏，信号评估由 signal_check_freq 每日执行，不受 rebalance_freq 限制。"
+
+signal_check_freq: "daily"
+
+position:
+  max_weight: "50%"
+  entry_batches: "2"
+  source: "assumption"
+  rationale: "板块级默认组合满仓（100%），建仓批次默认1次；因 B4 致命风险触发 conservative_default，组合仓位减半至50%，建仓批次+1至2批。"
+
+risk_control:
+  stop_loss: "组合净值相对入场净值下跌 10% 时触发止损"
+  take_profit: "组合净值相对入场净值上涨 20% 时触发止盈"
+  source: "assumption"
+  rationale: "通用默认止损 -15%、止盈 +20%；因 B4 致命风险触发 conservative_default，止损收紧为 -10%，止盈保持 +20% 不变。"
+
+conservative_default: true
+conservative_reason: "B4 key_risk_drivers 中'政策/监管对概念炒作降温' severity: 致命；且 B1 前提→行业 evidence 为空、核心传导未验证；C weakest_aspects 包含该致命项，触发 conservative_default。"
+conservative_override_note: "用户未明示仓位/止损/建仓批次参数；系统默认非保守值（组合仓位100%、止损-15%、建仓批次1）由静默保守模式自动调整为（组合仓位50%、止损-10%、建仓批次2）（自动化流程，不向用户发起确认）。"
+
+branch_mode: true
+original_params:
+  position:
+    max_weight: "100%"
+    entry_batches: "1"
+  risk_control:
+    stop_loss: "组合净值相对入场净值下跌 15% 时触发止损"
+    take_profit: "组合净值相对入场净值上涨 20% 时触发止盈"
+  note: "原策略=保守覆盖前的参数（忠实还原系统默认非保守值）；信号与持有期与保守版一致，仅仓位与风控放开。供双回测对比参考。"
+
+assumptions:
+  - "用户未指定具体个股，故按板块级回测（sector_level=true），以行业内真实 A 股龙头三花智控、绿的谐波、拓普集团、鸣志电器、汇川技术构建等权篮子近似具身智能/机器人板块暴露。"
+  - "买卖触发条件采用价格可计算指标：组合净值收盘价上穿/下穿20日均线，基于 web_experience 中 SuperMind 均线交叉示例，不使用 PE/PB 分位（数据源无估值数据）。"
+  - "持有周期采用静态默认：最长4个季度（季度调仓），rebalance_freq 仅用于权重再平衡；信号检查频率为 daily（技术/趋势类信号），不受调仓频率限制。"
+  - "仓位、建仓批次、止损止盈使用静态默认值；板块级默认组合满仓100%、建仓批次1次、止损-15%、止盈+20%；因 B4 致命风险触发保守模式，调整为组合仓位50%、建仓批次2次、止损-10%，止盈不变。"
+  - "回测窗口采用近3年通用窗口（2023-05-22 至 2026-05-22），锚定行情数据最新交易日；因想法为长期择时/持有型且无固定持有周期，不使用催化剂前6个月窗口。"
+  - "C 的 overall_confidence 为 low，仅作为待验证观察项，不改变任何 numeric 参数；后续需关注：具身智能概念热度向产业链传导是否被数据验证、板块热点能否转化为商业验证、个股层空缺需补充标的。"

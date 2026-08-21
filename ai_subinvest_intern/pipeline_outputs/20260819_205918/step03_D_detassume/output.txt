@@ -1,0 +1,71 @@
+strategy_name: "白酒龙头20日均线趋势跟踪策略"
+source_idea: "用户假设贵州茅台、五粮液、泸州老窖在股价站上20日均线后平均收益优于跌破后，执行站上买入、跌破卖出、满仓操作。"
+
+can_quantify: true
+sector_level: false
+blocking_reason: ""
+required_inputs: []
+
+backtest_window:
+  start: "2023-05-22"
+  end: "2026-05-22"
+  alignment: "holding_period"
+  note: "想法为长期择时/持有型（均线趋势跟踪），禁用catalyst窗口。采用季度持有期滚动回测，窗口锚定行情数据最新交易日2026-05-22，近3年区间。"
+
+stock_pool:
+  primary: "贵州茅台、五粮液、泸州老窖"
+  alternatives: ["山西汾酒", "洋河股份", "古井贡酒"]
+  source: "user"
+  note: "用户明确指定三只白酒龙头；alternatives为同赛道替代标的，供对比参考。"
+
+buy_trigger:
+  condition: "个股收盘价（ADJCLOSEPRICE）上穿20日简单移动平均线时买入"
+  rationale: "用户明确指定站上20日均线买入"
+  source: "user"
+
+sell_trigger:
+  condition: "个股收盘价（ADJCLOSEPRICE）下穿20日简单移动平均线时卖出"
+  rationale: "用户明确指定跌破20日均线卖出"
+  source: "user"
+
+holding_period:
+  duration: "季度调仓，最长4期"
+  rebalance_freq: "季度"
+  source: "assumption"
+  rationale: "用户未给持有周期，采用中期策略默认季度调仓（仅权重再平衡，非信号检查节奏），最长4期。信号检查按每日进行。"
+
+signal_check_freq: "daily"
+
+position:
+  max_weight: "16.65%"
+  entry_batches: "4"
+  source: "assumption"
+  rationale: "用户明示满仓投资三只股票，推断等权各1/3（33.3%）；因B4政策风险致命及B1核心假设无验证触发保守模式，单票仓位减半为约16.7%。建仓批次由默认3次增加为4次（保守模式+1）。"
+
+risk_control:
+  stop_loss: "-10%"
+  take_profit: "+20%"
+  source: "assumption"
+  rationale: "用户未指定止损止盈，采用通用默认-15%/+20%；因保守模式触发，止损收紧为-10%，止盈维持+20%。"
+
+conservative_default: true
+conservative_reason: "B4 key_risk_drivers中政策风险（消费税、限制三公消费）severity为致命；B1 chain中前提→行业核心收益假设P1无历史回测验证，构成核心逻辑断点。触发保守默认。"
+conservative_override_note: "用户明示满仓（推断等权仓位33.3%），静默保守模式自动调整为单票16.7%（自动化流程，不向用户发起确认）。"
+
+branch_mode: true
+original_params:
+  position:
+    max_weight: "33.3%"
+    entry_batches: "3"
+  risk_control:
+    stop_loss: "-15%"
+    take_profit: "+20%"
+  note: "原策略=保守覆盖前的参数（忠实还原用户本意/系统默认非保守值）；信号与持有期与保守版一致，仅仓位与风控放开。供双回测对比参考。"
+
+assumptions:
+  - "用户未指定均线计算方式，采用收盘价（ADJCLOSEPRICE）20日简单移动平均线。"
+  - "用户明示满仓，推断为三只股票等权分配，单票仓位约33.3%。"
+  - "持有周期未指定，采用季度调仓（仅权重再平衡），最长4期。"
+  - "止损止盈未指定，采用通用默认-15%/+20%；保守模式止损收紧至-10%。"
+  - "web_experience无明确可用的单票仓位/止损止盈数值惯例，故相关参数回落到静态默认或用户推断。"
+  - "如需对比不同参数方案，可调整后重新回测。"

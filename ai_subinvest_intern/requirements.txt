@@ -1,0 +1,7 @@
+openai==2.50.0
+python-dotenv==1.2.2
+pandas==3.0.0
+numpy==2.4.2
+pyyaml==6.0.3
+akshare==1.18.83
+baostock==0.9.3

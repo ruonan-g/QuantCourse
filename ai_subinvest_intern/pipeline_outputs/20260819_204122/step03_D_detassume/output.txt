@@ -1,0 +1,77 @@
+strategy_name: "半导体设备四股趋势突破策略（60日均线突破买入/跌破卖出，季度调仓）"
+source_idea: "投资北方华创、中微公司、拓荆科技、华海清科四只半导体设备个股的等权组合，在突破60日年线时买入，跌破时卖出，季度调仓，单票仓位上限15%。"
+
+can_quantify: true
+sector_level: false
+blocking_reason: ""
+required_inputs: []
+
+backtest_window:
+  start: "2023-05-22"
+  end: "2026-05-22"
+  alignment: "holding_period"
+  note: "想法为长期趋势择时型（基于均线突破/跌破，持有周期为季度级），禁止使用 catalyst。持有周期为季度调仓，在近3年窗口内滚动多段季度子窗口，整体窗口锚定行情数据最新交易日 DATA_LATEST_DATE=2026-05-22。"
+
+stock_pool:
+  primary: "北方华创、中微公司、拓荆科技、华海清科等权组合"
+  alternatives: ["盛美上海", "芯源微", "中科飞测", "微导纳米"]
+  source: "user"
+  note: "用户明确提到四只标的的等权组合；alternatives 来自 B5 替代选择分析中的同赛道可比标的，供回测引擎参考，不作为主标的。"
+
+buy_trigger:
+  condition: "四股等权组合净值收盘价上穿60日均线"
+  rationale: "用户原始想法为突破60日年线买入，但60日年线定义存在歧义（60日均线/250日年线/两者同时）。为落地为价格可计算指标，取60日均线作为默认趋势均线，采用组合净值以避免个股信号不一致。"
+  source: "assumption"
+  evidence_source: {}
+
+sell_trigger:
+  condition: "四股等权组合净值收盘价跌破60日均线"
+  rationale: "用户原始想法为跌破60日年线卖出，落地为60日均线，与买入信号对称。"
+  source: "assumption"
+  evidence_source: {}
+
+holding_period:
+  duration: "季度调仓，最长4期（约1年）"
+  rebalance_freq: "季度"
+  source: "user"
+  rationale: "用户指定季度调仓；最长4期采用系统默认中期策略默认值。rebalance_freq 仅控制权重再平衡，不作为信号评估闸门。"
+  evidence_source: {}
+
+signal_check_freq: "daily"
+
+position:
+  max_weight: "7.5%"
+  entry_batches: "4"
+  source: "user"
+  rationale: "用户明示单票仓位上限15%，保守模式因致命风险触发，仓位减半至7.5%；建仓批次用户未明示，采用系统默认个股级3批，保守模式+1至4批。"
+  evidence_source: {}
+
+risk_control:
+  stop_loss: "-10%"
+  take_profit: "+20%"
+  source: "assumption"
+  rationale: "用户未明示止损止盈，采用系统默认 -15%/+20%；因保守模式触发，止损收紧至 -10%，止盈保持 +20%。"
+  evidence_source: {}
+
+conservative_default: true
+conservative_reason: "触发原因：1) B4 关键风险驱动中“地缘政治/出口管制升级”severity=致命；2) B1 前提→行业环节核心传导未验证（突破后正收益概率无回测证据），存在关键未验证链接；3) C 的 weakest_aspects 包含致命风险相关项。"
+conservative_override_note: "用户明示 position.max_weight=15%（单票上限），静默保守模式自动调整为7.5%（自动化流程，不向用户发起确认）；其余参数按保守规则调整。"
+
+branch_mode: true
+original_params:
+  position:
+    max_weight: "15%"
+    entry_batches: "3"
+  risk_control:
+    stop_loss: "-15%"
+    take_profit: "+20%"
+  note: "原策略=保守覆盖前的参数（用户明示单票15%上限，系统默认个股级3批建仓、-15%止损、+20%止盈）；信号与持有期与保守版一致，仅仓位与风控放开。供双回测对比参考。"
+
+assumptions:
+  - "60日年线歧义已落地为60日均线（收盘价），仅使用价格可计算指标，不含PE/PB分位。"
+  - "用户未明示建仓批次，采用系统默认个股级3批；保守模式+1至4批。"
+  - "用户未明示止损止盈，采用系统默认 -15%/+20%；保守模式止损收紧至 -10%。"
+  - "回测引擎使用四股等权组合净值计算买卖信号；季度调仓仅做权重再平衡，信号检查频率为每日。"
+  - "max_weight 为用户明示单票上限（来源：B1/B4 gap 中提及单票15%上限），保守减半为7.5%。"
+  - "web_experience 检索结果未提供可直接采用的60日均线定义、止损比例或建仓批次行业惯例，相关参数使用静态默认或用户明示值。"
+  - "若需对比不同参数方案，可调整后重新回测。"

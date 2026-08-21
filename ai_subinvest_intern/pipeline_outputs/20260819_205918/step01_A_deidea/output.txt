@@ -1,0 +1,47 @@
+idea:
+  original: "白酒龙头贵州茅台、五粮液、泸州老窖，站上 20 日均线就买、跌破就卖，满仓干。"
+  type: "事件驱动"
+  summary: "对白酒龙头股执行20日均线趋势跟踪策略，满仓交易。"
+
+logic_chain:
+  premise_layer:
+    - id: "P1"
+      proposition: "用户策略假设贵州茅台、五粮液、泸州老窖的股价在站上20日均线后，后续平均收益优于跌破20日均线后的后续平均收益"
+      verifiable: true
+      verification_method: "使用历史日线行情数据，分别计算上穿和下穿20日均线后N个交易日的平均收益并比较"
+  industry_layer:
+    - id: "I1"
+      proposition: "贵州茅台、五粮液、泸州老窖均属于申万白酒行业，且为市值排名前三的龙头公司"
+      verifiable: true
+      verification_method: "查阅申万行业分类标准和公司市值排名"
+  stock_layer:
+    - id: "S1"
+      proposition: "贵州茅台是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+    - id: "S2"
+      proposition: "五粮液是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+    - id: "S3"
+      proposition: "泸州老窖是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+
+target:
+  stock: "贵州茅台、五粮液、泸州老窖"
+  industry: "白酒"
+  style: "事件驱动"
+
+user_specified_rules:
+  buy_condition: "股价站上20日均线"
+  sell_condition: "股价跌破20日均线"
+  position: "满仓"
+  stocks: ["贵州茅台", "五粮液", "泸州老窖"]
+
+missing_info:
+  - "三只股票之间的资金分配比例"
+  - "均线计算方式（简单均线/指数均线，收盘价/盘中价）"
+  - "交易成本与滑点假设"
+  - "回测区间与数据频率"
+  - "满仓下的再平衡或资金调整规则"

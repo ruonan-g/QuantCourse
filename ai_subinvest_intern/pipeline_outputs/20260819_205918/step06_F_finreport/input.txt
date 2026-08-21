@@ -1,0 +1,913 @@
+
+以下是前面所有步骤的完整产出，请按报告模板组装最终分析报告：
+
+## Skill A 输出（想法拆解）
+idea:
+  original: "白酒龙头贵州茅台、五粮液、泸州老窖，站上 20 日均线就买、跌破就卖，满仓干。"
+  type: "事件驱动"
+  summary: "对白酒龙头股执行20日均线趋势跟踪策略，满仓交易。"
+
+logic_chain:
+  premise_layer:
+    - id: "P1"
+      proposition: "用户策略假设贵州茅台、五粮液、泸州老窖的股价在站上20日均线后，后续平均收益优于跌破20日均线后的后续平均收益"
+      verifiable: true
+      verification_method: "使用历史日线行情数据，分别计算上穿和下穿20日均线后N个交易日的平均收益并比较"
+  industry_layer:
+    - id: "I1"
+      proposition: "贵州茅台、五粮液、泸州老窖均属于申万白酒行业，且为市值排名前三的龙头公司"
+      verifiable: true
+      verification_method: "查阅申万行业分类标准和公司市值排名"
+  stock_layer:
+    - id: "S1"
+      proposition: "贵州茅台是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+    - id: "S2"
+      proposition: "五粮液是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+    - id: "S3"
+      proposition: "泸州老窖是用户指定的白酒龙头标的之一，其股票在A股上市，具有完整的日线历史行情数据，可计算20日均线"
+      verifiable: true
+      verification_method: "查询交易所行情数据和公司上市信息"
+
+target:
+  stock: "贵州茅台、五粮液、泸州老窖"
+  industry: "白酒"
+  style: "事件驱动"
+
+user_specified_rules:
+  buy_condition: "股价站上20日均线"
+  sell_condition: "股价跌破20日均线"
+  position: "满仓"
+  stocks: ["贵州茅台", "五粮液", "泸州老窖"]
+
+missing_info:
+  - "三只股票之间的资金分配比例"
+  - "均线计算方式（简单均线/指数均线，收盘价/盘中价）"
+  - "交易成本与滑点假设"
+  - "回测区间与数据频率"
+  - "满仓下的再平衡或资金调整规则"
+
+## Skill B1-B5 输出（五维度分析）
+### B1_logic
+{
+  "dimension": "逻辑自洽性",
+  "analysis": {
+    "process_note": "按三段论逐环检验：前提→行业、行业→个股。对每环分解传导机制、列证据、标缺口与替代解释。",
+    "chain": [
+      {
+        "link": "前提→行业",
+        "claim": "用户策略假设：贵州茅台、五粮液、泸州老窖三只白酒龙头股在股价站上20日均线后的平均收益优于跌破20日均线后的平均收益；该假设被放入申万白酒行业市值前三龙头的行业框架下。",
+        "transmission": "前提层命题P1假设三只个股的20日均线上穿/下穿信号具有收益区分能力；行业层命题I1将三只股票共同归类为申万白酒行业市值前三龙头。若P1成立，则这种均线信号收益区分可被视为三只白酒龙头组成的行业组内共同特征，从而为在该组内执行站上买入、跌破卖出的规则提供逻辑基础。",
+        "evidence": [
+          "申万行业分类：贵州茅台、五粮液、泸州老窖均属于申万白酒行业成分股（可查申万宏源行业分类标准）",
+          "市值排名：三者为白酒行业市值排名靠前的龙头公司（可查交易所市值数据）"
+        ],
+        "gap": "P1的核心命题尚未提供实际历史回测结果，无法确认上穿/下穿20日均线后的平均收益差异是否真实存在；未指定均线计算方式（简单均线/指数均线，收盘价/盘中价）、回测区间、数据频率、收益计算口径；满仓下三只股票的资金分配比例、再平衡或资金调整规则缺失，影响对策略收益差异的验证。",
+        "alternative_explanation": "即使三只白酒龙头历史均线信号表现出收益差异，也可能来自市场动量效应、流动性特征或白酒板块整体趋势，而非白酒行业基本面属性；三只龙头可能因机构持仓和共同beta而表现趋同。"
+      },
+      {
+        "link": "行业→个股",
+        "claim": "三只白酒龙头标的——贵州茅台、五粮液、泸州老窖——作为该策略执行对象，均在A股上市且具备完整日线历史行情数据，可计算20日均线并执行站上买入、跌破卖出的交易规则。",
+        "transmission": "行业层命题I1确认三只股票均为白酒行业龙头；个股层命题S1、S2、S3进一步确认三只股票均在A股上市，具备完整日线行情。因此从行业归属可传导至个股层面：20日均线可被计算，买卖条件在技术执行上具备可操作性。",
+        "evidence": [
+          "贵州茅台、五粮液、泸州老窖均为A股上市股票，可查询上交所/深交所行情数据",
+          "三只股票均有完整日线历史行情，可用于计算20日均线（可查Wind、同花顺等行情终端）",
+          "三只股票均属于申万白酒行业，可验证行业归属（来源：申万行业分类）"
+        ],
+        "gap": "行业层仅确认行业分类，未给出行业利好或风险向个股收益传导的机制；三只股票之间的资金分配比例未指定；20日均线计算方式、交易成本与滑点假设、满仓下的再平衡或资金调整规则均未提供。",
+        "alternative_explanation": "个股可交易、可计算均线并不代表行业层因素对股价趋势具有解释力；三只白酒龙头各自受公司特定事件、估值、资金流影响，均线信号可能在不同个股上表现分化。"
+      }
+    ],
+    "unverified_links": [
+      "前提→行业：P1的收益区分能力缺乏实际历史回测结果，均线参数、回测区间与收益口径未定",
+      "前提→行业：三只白酒龙头的行业属性是否导致均线策略有效，缺乏机制证据",
+      "行业→个股：行业分类到三只个股的传导仅为可执行性确认，缺少收益传导机制",
+      "资金分配比例、均线计算方式、交易成本与滑点、回测区间与频率、满仓再平衡规则均未提供"
+    ],
+    "alternative_explanations": [
+      "均线策略有效可能源于市场动量/趋势效应，而非白酒行业属性",
+      "三只龙头股存在共同机构持仓和市场beta，可能造成策略表现趋同",
+      "个股表现可能受公司特定事件影响，行业层解释不充分"
+    ]
+  },
+  "presentation": {
+    "evidence_strength": {
+      "前提→行业": "weak",
+      "行业→个股": "moderate"
+    },
+    "logic_read": "该想法在标的可执行性上链路清晰，但核心策略收益假设尚未用数据验证，且行业层与个股层之间缺乏因果传导，逻辑自洽性依赖于未提供的回测结果与交易规则细节。"
+  }
+}
+
+### B2_timing
+{
+  "dimension": "时机",
+  "analysis": {
+    "process_note": "本维度从事件窗口、趋势与估值位置的可核实程度出发，列示已披露及待兑现催化剂，并给出改善/恶化条件；价格趋势与估值位置因缺少行情数据无法核实。",
+    "market_regime": "无法核实：未获得贵州茅台、五粮液、泸州老窖当前价格及20日均线位置，无法判断趋势方向；从事件时间看，当前处于三只个股一季报密集披露后、贵州茅台2026年5月11日业绩说明会前的事件窗口，具体事件见catalysts。",
+    "valuation_context": "无法核实：检索证据未覆盖当前PE/PB及历史分位。已披露一季报中，贵州茅台归母净利润同比+1.47%（来源：http://www.news.cn/enterprise/20260424/2c5a81efc8ad4110840f7f48a83fe2ef/c.html），五粮液归母净利润同比+82.57%（来源：https://stcn.com/article/detail/3892558.html），泸州老窖盈利数据未在检索摘要中体现，无法形成估值相对位置判断。",
+    "catalysts": [
+      {
+        "event": "贵州茅台2026年一季报披露：营业总收入547.03亿元，同比+6.34%；归母净利润272.43亿元，同比+1.47%",
+        "window": "2026-04-24（已兑现）",
+        "direction": "偏多",
+        "source": "http://www.news.cn/enterprise/20260424/2c5a81efc8ad4110840f7f48a83fe2ef/c.html"
+      },
+      {
+        "event": "贵州茅台2025年度及2026年第一季度业绩说明会",
+        "window": "2026-05-11 16:00—17:30（待兑现）",
+        "direction": "中性",
+        "source": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?stockid=600519&id=12243772"
+      },
+      {
+        "event": "五粮液2026年一季报披露：营业收入228.38亿元，同比+33.67%；归母净利润80.63亿元，同比+82.57%",
+        "window": "2026-04-30（已兑现）",
+        "direction": "偏多",
+        "source": "https://stcn.com/article/detail/3892558.html"
+      },
+      {
+        "event": "五粮液下一财报（2026年半年度报告）预计披露",
+        "window": "预计2026-08-29（待核实，以公司公告为准）",
+        "direction": "中性",
+        "source": "https://www.moomoo.com/hans/stock/000858-SZ/earnings"
+      },
+      {
+        "event": "泸州老窖2026年第一季度报告披露",
+        "window": "2026-04-29（已兑现）",
+        "direction": "中性",
+        "source": "http://static.cninfo.com.cn/finalpage/2026-04-29/1225240669.PDF"
+      },
+      {
+        "event": "泸州老窖2021年限制性股票激励计划部分解除限售股份上市流通（1,990,614股）",
+        "window": "2026-02-24（已发生）",
+        "direction": "偏空",
+        "source": "https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?stockid=000568&id=12261738"
+      }
+    ],
+    "favorable_conditions": [
+      "三只个股当前价格均位于20日均线上方且20日均线拐头向上，并伴随成交量放大（需实时行情数据核实，当前无法确认）",
+      "白酒板块出现整体资金净流入，行业指数同步站上20日均线，板块趋势与个股20日均线信号形成共振",
+      "贵州茅台2026年5月11日业绩说明会释放改革、渠道、价格体系积极信号，增强市场对板块盈利稳定性的预期",
+      "五粮液一季报高增长被市场解读为可持续而非单纯低基数效应，泸州老窖后续批价与动销数据不弱于预期",
+      "若持有周期为短周期且事件窗口临近，价格在事件前温和回踩20日均线不破，时机相对更有利"
+    ],
+    "unfavorable_conditions": [
+      "三只个股价格跌破20日均线或20日均线走平向下，趋势跟踪信号转弱",
+      "一季报利好兑现后出现利好出尽回落，尤其贵州茅台归母净利润同比仅+1.47%低于市场对龙头的成长预期，泸州老窖盈利未提取到超预期数据",
+      "五粮液高增长主要因上年同期低基数，若后续季度增速回落或市场认为不可持续，情绪可能反转",
+      "白酒板块资金持续流出、行业指数跌破20日均线，板块趋势与个股20日均线信号背离",
+      "贵州茅台业绩说明会给出保守或低于预期的全年/渠道指引，或渠道改革引发批价波动",
+      "满仓且未设定持有周期，20日均线在震荡市中假突破频繁，交易成本与滑点可能持续侵蚀收益"
+    ],
+    "gap": "用户未给持有周期；缺少三只个股当前价格、20日均线位置、成交量、估值PE/PB及历史分位等行情数据；检索未覆盖白酒板块资金流向与行业指数趋势；泸州老窖2026年一季报具体盈利数据未提取，无法判断其业绩方向；五粮液下一财报日期来源为第三方预测，需以公司公告为准"
+  },
+  "presentation": {
+    "evidence_strength": {
+      "market_regime": "weak",
+      "catalysts": "moderate"
+    },
+    "timing_read": "三只白酒龙头一季报密集落地、贵州茅台业绩说明会临近，事件窗口偏密，但当前价格趋势与估值位置无法核实，时机判断缺乏关键行情数据支撑，需补充实时行情后再作评估。"
+  }
+}
+
+### B4_risk
+{
+  "dimension": "风险收益比",
+  "analysis": {
+    "process_note": "从20日均线趋势跟踪策略出发，分别对三只白酒龙头（贵州茅台、五粮液、泸州老窖）的上行/下行做情景展开。上行依赖趋势延续与板块情绪修复，下行暴露于政策、需求、估值及策略失效。幅度基于历史波动率和板块历史回撤估算，缺乏回测数据，精确度有限。",
+    "upside_scenarios": [
+      {
+        "scenario": "白酒板块情绪修复，龙头估值回升。三只股票同步站上20日均线后，趋势资金与北向资金回流，形成正反馈。",
+        "magnitude": "+20%~+35%（依据：白酒龙头近一年年化波动率约25%-35%，从当前估值分位修复至中枢水平对应空间）",
+        "trigger": "板块指数同步站上20日均线，北向资金连续净流入，茅台批价企稳回升，市场风险偏好改善"
+      },
+      {
+        "scenario": "基本面稳健与高分红提供下方缓冲，股价站稳20日均线后修复至前期平台。",
+        "magnitude": "+10%~+20%（依据：龙头股息率支撑，估值修复至近三年中枢附近）",
+        "trigger": "季报/中报符合预期，渠道库存下降，批价止跌，无重大政策利空"
+      },
+      {
+        "scenario": "技术性趋势加速，放量突破20日均线及前高，吸引量化/趋势资金短期聚集。",
+        "magnitude": "+10%~+15%（依据：突破后短期动量效应，历史突破行情常见脉冲幅度）",
+        "trigger": "单周放量上涨，突破近期高点，均线多头排列"
+      }
+    ],
+    "downside_scenarios": [
+      {
+        "scenario": "均线策略失效，股价假突破后回落，反复穿越20日均线，导致连续小幅止损。",
+        "magnitude": "-10%~-20%（依据：震荡市中均线策略典型回撤，龙头股波动率）",
+        "trigger": "20日均线走平，价格在均线附近反复穿越，成交量萎缩"
+      },
+      {
+        "scenario": "白酒需求疲软、渠道库存高企，批价下行，估值中枢下移。",
+        "magnitude": "-20%~-30%（依据：白酒板块历史需求下行周期回撤幅度，如2018、2021-2024）",
+        "trigger": "茅台批价持续下跌，社会库存上升，龙头公司下修业绩指引，高端消费数据走弱"
+      },
+      {
+        "scenario": "政策风险兑现，消费税上调或限制公务消费等政策出台，行业盈利预期与估值双杀。",
+        "magnitude": "-25%~-40%（依据：历史政策打压周期最大回撤，但当前估值低于当时，故略小）",
+        "trigger": "出台白酒消费税上调、限制三公消费、监管约谈等政策文件"
+      },
+      {
+        "scenario": "市场系统性下跌，白酒作为权重股被抛售。",
+        "magnitude": "-15%~-25%（依据：白酒板块beta较高，历史上系统性回撤幅度）",
+        "trigger": "宏观经济恶化、流动性收紧、外部冲击导致大盘下跌"
+      }
+    ],
+    "asymmetry": "上行情景幅度约 +10%~+35%，下行情景幅度约 -10%~-40%。下行极端情景（政策、基本面恶化）幅度可能大于上行，且上行缺乏明确基本面催化剂锚点，更多依赖趋势延续和情绪修复；若仅看技术性趋势，上下行可能接近对称，但考虑政策尾部风险，下行尾部更重。",
+    "key_risk_drivers": [
+      {
+        "driver": "政策风险（消费税、限制三公消费）",
+        "signal": "政策文件发布、官方表态、消费税改革草案、监管约谈",
+        "severity": "致命"
+      },
+      {
+        "driver": "需求与库存周期",
+        "signal": "茅台/五粮液/国窖批价走势、经销商库存指数、社零烟酒类零售额增速",
+        "severity": "重大"
+      },
+      {
+        "driver": "估值压缩风险",
+        "signal": "PE/PB历史分位数、无风险利率上行、北向资金持续流出",
+        "severity": "重大"
+      },
+      {
+        "driver": "趋势策略失效（震荡市反复止损）",
+        "signal": "均线走平、价格反复穿越20日均线、策略连续回撤",
+        "severity": "可控"
+      },
+      {
+        "driver": "集中度与流动性风险（三只白酒龙头高度同质）",
+        "signal": "白酒板块指数波动率、个股相关系数、跌停或流动性枯竭",
+        "severity": "重大"
+      }
+    ],
+    "gap": "用户风险偏好、资金规模、可承受回撤未知；三只股票之间的资金分配比例未知；均线计算方式（简单/指数，收盘/盘中）未知；交易成本与滑点假设未知；回测区间与数据频率未知；是否考虑分红除权未知；满仓下是否有再平衡或止损规则未知。"
+  },
+  "presentation": {
+    "evidence_strength": {
+      "upside_scenarios": "moderate",
+      "downside_scenarios": "weak"
+    },
+    "risk_read": "满仓执行20日均线策略叠加白酒集中持仓，下行尾部风险可能被放大，而上行缺乏明确催化，风险收益结构需使用者结合自身风险承受力判断。"
+  }
+}
+
+### B3_value
+{
+  "dimension": "估值",
+  "analysis": {
+    "process_note": "先整理三只白酒龙头当前 PE-TTM/PB 及口径；再核对可检索到的历史分位与行业偏离；最后结合用户“站上20日均线买入、跌破卖出、满仓”的趋势跟踪逻辑，给出仅作为赔率/安全边际背景的便宜/贵参考阈值。该策略本质由均线触发，估值不构成买卖条件。",
+    "current_valuation": {
+      "metric": "PE-TTM（主口径）；PB 为辅",
+      "value": "贵州茅台 PE-TTM 19.85–20.29，PB 5.88–6.43；五粮液 PE-TTM 12.91，PB 3.10；泸州老窖 PE-TTM 12.82，PB 2.63",
+      "note": "贵州茅台 PE-TTM：小乐财报 19.85（2026-08-17）、理杏仁 19.85（2026-08-03）、英为财情 20.29（TTM）；贵州茅台 PB：理杏仁 6.43、英为财情 5.88（最新季度），口径/时点差异导致小幅偏差。五粮液 PE-TTM 12.91、PB 3.10 来自 ddgp.net，检索摘要未标注具体日期。泸州老窖 PE-TTM 12.82 来自小乐财报（2026-08-18，PE-TTM口径：总市值/归母净利润TTM）；PB 2.63 来自亿牛网，日期未明；另有亿牛网泸州老窖市盈率 10.32，因日期/静态口径不清，未作为 PE-TTM 主值采用。",
+      "source": "https://www.leetab.com/stock/sh600519/pe ; https://cn.investing.com/equities/moutai-ratios ; https://www.lixinger.com/equity/company/detail/sh/600519/600519 ; https://www.ddgp.net/wuliangye-sz000858-stock-fundamental-valuationp-e-ratio-pep-e-ratio-ttmp-s-ratio-psp-s-ratio-ttmp-b-ratio-pb ; https://www.leetab.com/stock/sz000568/pe ; https://eniu.com/gu/sz000568/pb"
+    },
+    "historical_percentile": "贵州茅台：小乐财报给出当前分位点 15%（2026-08-17），但未注明回看区间（近3年/5年/上市以来）；理杏仁未提供分位。泸州老窖：小乐财报给出当前分位点 23%（2026-08-18），同样未注明回看区间。五粮液：ddgp.net 给出 1/3/5 年分位，但数据存在矛盾——当前 12.91 低于其给出的 1 年区间下限 13.94，却标注 79.7%/99.9%/97.1% 分位，逻辑上不成立，故五粮液历史分位无法采信，需基本面数据层计算。整体看，茅台与泸州老窖的源报分位偏低，但因区间口径缺失，只能作为参考，不能直接等同于近3年或近5年分位。",
+    "vs_industry": "英为财情显示贵州茅台所属行业平均 PE 为 22.54（行业构成与计算口径未披露）：贵州茅台 PE-TTM 20.29 较行业均值低约 10.0%；五粮液 12.91 低约 42.7%；泸州老窖 12.82 低约 43.1%。PB 的行业均值未检索到，相对行业 PB 偏离无法核实。行业均值仅为粗略参照，可能包含非白酒成分，不宜作为精确比较基准。",
+    "thesis_anchored_interpretation": {
+      "cheap_threshold": "对此 20 日均线趋势跟踪策略而言，估值不触发买卖，只作为持仓赔率与安全边际背景。若在均线买入时：贵州茅台 PE-TTM ≤ 20（小乐财报机会值 20，约低于历史 20%）、五粮液 PE-TTM ≤ 约 13（当前检索值附近；可靠机会值无法核实）、泸州老窖 PE-TTM ≤ 12.6（小乐财报机会值 12.58，约低于历史 20%），可视为该逻辑下安全边际较厚的“便宜”参考——即使均线出现假突破，低估值背景可能压低趋势失败后的估值收缩空间。",
+      "expensive_threshold": "若在均线买入时：贵州茅台 PE-TTM > 22.3（接近小乐财报中位值 22.26）或高于英为财情行业均值 22.54、五粮液 PE-TTM > 约 17.9（ddgp.net 3 年均值，但分位数据矛盾，仅作参考）、泸州老窖 PE-TTM > 14.1（小乐财报中位值 14.07），则在该逻辑下可视为“贵”参考——高估值背景下，20 日线破位后估值下修风险可能放大。该阈值仅作为风险背景，不构成卖出触发条件。"
+    },
+    "gap": "① 历史分位区间口径缺失：小乐财报对茅台/泸州老窖仅给百分位，未注明近3年/5年/上市以来；五粮液分位数据存在矛盾，需基本面数据层重算。② 无 forward PE 或盈利预期数据，无法评估趋势持有期内的预期估值变化。③ 五粮液、泸州老窖的历史机会值/中位值可靠性不足；PB 行业均值无法核实；泸州老窖亿牛网 PB/PE 日期未明。④ 本策略并非估值驱动，估值阈值只能作为背景参考，不应被后续步骤当作交易执行参数。"
+  },
+  "presentation": {
+    "evidence_strength": {
+      "current_valuation": "strong",
+      "thesis_anchored_interpretation": "moderate"
+    },
+    "valuation_read": "三只白酒龙头当前 PE-TTM 分别约为 19.9–20.3、12.9、12.8，均低于所引行业均值 22.54，茅台/泸州老窖源报分位 15%/23%（区间未明），估值背景偏便宜但历史分位数据有待核实；对 20 日均线满仓策略而言，估值主要提供安全边际背景，不改变均线触发规则。"
+  }
+}
+
+### B5_alternative
+{
+  "dimension": "替代选择",
+  "analysis": {
+    "process_note": "列同赛道可比、按 thesis 相关维度对比、描述目标定位。",
+    "comparables": [
+      {
+        "name": "山西汾酒",
+        "thesis_relevant_dims": {
+          "申万白酒行业": "是",
+          "市值/流动性": "白酒第二梯队，流动性好于多数区域酒，可用于趋势交易",
+          "产品/价格带": "清香型，次高端/高端全国化",
+          "与20日均线策略相关特征": "历史数据完整，但价格波动与目标组合相关性较高"
+        },
+        "note": "与目标三只同属白酒龙头，但香型、渠道和高端价格带份额存在差异；未纳入用户标的。"
+      },
+      {
+        "name": "洋河股份",
+        "thesis_relevant_dims": {
+          "申万白酒行业": "是",
+          "市值/流动性": "白酒第二梯队，流动性较好，趋势交易可操作性可回测",
+          "产品/价格带": "浓香型，次高端/中高端，省外市场较广",
+          "与20日均线策略相关特征": "历史数据完整，趋势策略可验证，但高端品牌暴露弱于茅台/五粮液"
+        },
+        "note": "与泸州老窖同属浓香，但价格带和成长阶段不同，可视为部分替代。"
+      },
+      {
+        "name": "古井贡酒",
+        "thesis_relevant_dims": {
+          "申万白酒行业": "是",
+          "市值/流动性": "区域龙头中市值居前，流动性低于头部三只，趋势交易需考虑冲击成本",
+          "产品/价格带": "浓香型，区域次高端，安徽省内为主",
+          "与20日均线策略相关特征": "历史数据完整，但区域属性可能弱化全国化高端趋势敏感性"
+        },
+        "note": "同赛道但区域性更强，与目标组合在白酒板块内属于不同子赛道。"
+      },
+      {
+        "name": "中证白酒指数/ETF",
+        "thesis_relevant_dims": {
+          "申万白酒行业": "是（覆盖白酒板块）",
+          "市值/流动性": "ETF流动性取决于规模，通常可满足趋势交易",
+          "产品/价格带": "覆盖高端、次高端、区域酒，分散单一个股风险",
+          "与20日均线策略相关特征": "指数历史数据完整，降低个股特有事件影响"
+        },
+        "note": "可替代个股组合，但无法精确复现用户指定的三只龙头集中度。"
+      }
+    ],
+    "target_positioning": "目标三只集中于高端/次高端全国化白酒龙头，对高端白酒景气度、机构持仓和头部价格趋势的暴露较集中；在20日均线趋势跟踪逻辑下，其高流动性、高关注度和较长上市历史使其信号具有一定可操作性。同赛道其他标的在香型、价格带和区域属性上存在差异，无法完全等同替代，但白酒ETF或次高端龙头可部分覆盖其板块 beta 暴露。",
+    "gap": "用户指定三只标的但未给出筛选标准（如是否必须市值前三、是否排除山西汾酒/洋河股份等），严格按市值排序需核对山西汾酒与泸州老窖的位置；替代对比尚未基于20日均线历史胜率/收益做量化验证。"
+  },
+  "presentation": {
+    "evidence_strength": {
+      "comparables": "moderate",
+      "target_positioning": "weak"
+    },
+    "alternative_read": "同赛道内有其他可做趋势跟踪的白酒标的，但三只组合对高端白酒的集中暴露在香型与价格带上不易被单一标的完全替代。"
+  }
+}
+
+## Skill C 输出（综合研判）
+{
+  "dimension": "综合研判",
+  "analysis": {
+    "process_note": "逐维度读取 B 的 analysis 内容，提炼支撑/薄弱点、关键不确定性，构造确认/证伪条件。",
+    "best_supported_aspects": [
+      "标的识别与可执行性：三只股票均属申万白酒行业成分股且市值排名靠前，均为A股上市并具备完整日线历史行情，可计算20日均线（B1 行业→个股 evidence）。",
+      "估值背景：贵州茅台、五粮液、泸州老窖当前PE-TTM分别约19.9–20.3、12.9、12.8，均低于所引行业均值22.54；茅台/泸州老窖源报分位15%/23%，虽区间未明但偏便宜（B3 current_valuation/vs_industry）。",
+      "可核实催化剂：茅台2026一季报营收+6.34%归母+1.47%、五粮液一季报营收+33.67%归母+82.57%已兑现；茅台业绩说明会2026-05-11待兑现（B2 catalysts）。",
+      "同赛道替代选择可部分覆盖板块beta：中证白酒指数/ETF及山西汾酒、洋河等可部分覆盖，但无法完全复现高端龙头集中度（B5 comparables/target_positioning）。"
+    ],
+    "weakest_aspects": [
+      "核心收益假设无回测验证：P1仅假设均线上穿/下穿收益差异，未提供任何历史回测结果；均线计算方式、回测区间、数据频率、收益口径均未指定（B1 gap/unverified_links）。",
+      "行业→个股缺乏收益传导：行业分类只确认可执行性，未提供行业层因素向个股收益传导的机制；替代解释指出均线收益可能来自动量/趋势效应与共同机构持仓/市场beta，而非白酒行业属性（B1 alternative_explanation）。",
+      "当前趋势与估值位置不可核实：缺少三只个股当前价格、20日均线位置、成交量、估值PE/PB及历史分位，市场regime与估值context均为无法核实；泸州老窖一季报盈利未提取，五粮液分位数据矛盾无法采信（B2 gap/B3 gap）。",
+      "致命政策风险：消费税上调、限制三公消费等政策风险被列为severity:致命，且下行极端情景（-25%~-40%）可能大于上行（B4 key_risk_drivers/asymmetry）。",
+      "满仓集中同质风险：三只白酒龙头高度同质，集中度与流动性风险重大；满仓叠加20日均线假突破可能反复止损，且资金分配、再平衡、止损、交易成本与滑点、分红除权等规则完全空缺（B4 key_risk_drivers/gap；B1 gap）。"
+    ],
+    "key_uncertainties": [
+      "核心命题P1尚未证实：三只个股上穿20日均线后平均收益是否优于下穿后平均收益，没有提供回测结果。",
+      "行业因素是否对三只个股均线信号的收益差异有因果解释，还是仅为市场动量/共同机构持仓与板块beta所致。",
+      "当前三只个股价格与20日均线位置、成交量、板块资金流向及指数趋势无法核实，无法判断当前市场状态下策略是否处于有利阶段。",
+      "泸州老窖一季报盈利数据未提取，五粮液高增长是否为低基数效应，以及茅台低增速是否被市场接受。",
+      "政策尾部风险（消费税、限制三公消费）是否兑现，以及满仓集中持有三只高度同质白酒股的流动性/集中度风险如何演化。"
+    ],
+    "confirm_condition": "若同时出现：① 历史回测显示三只个股上穿20日均线后N个交易日平均收益显著高于下穿后平均收益，且扣除市场beta后仍成立；② 实时行情显示三只个股价格均位于20日均线上方、20日均线拐头向上、成交量放大，白酒指数同步站上20日均线且板块资金连续净流入；③ 茅台批价止跌回升，五粮液高增长被后续数据证实为需求驱动而非低基数，泸州老窖一季报盈利不低于预期，则逻辑成立。",
+    "falsify_condition": "若出现以下任一事实：① 政策层面出台消费税上调、限制三公消费或类似监管文件；② 三只个股或白酒指数同步跌破20日均线且均线走平向下，板块资金持续流出；③ 历史回测显示上穿/下穿20日均线后的收益无显著差异或反向，或20日均线在震荡市中连续多次假突破造成实际连续止损；④ 茅台业绩说明会释放低于预期的渠道/全年指引，或茅台批价持续下行、渠道库存上升，则 thesis 被推翻。",
+    "dimension_notes": [
+      {"dimension": "逻辑自洽性", "highlight": "标的可执行性链路清晰，但核心均线收益假设无回测验证，行业→个股缺少收益传导，替代解释为动量/共同机构持仓/市场beta。"},
+      {"dimension": "时机", "highlight": "一季报已兑现催化偏多，茅台业绩说明会待兑现，但价格趋势与估值位置无法核实，持有周期与板块资金数据缺失，泸州老窖盈利未提取。"},
+      {"dimension": "估值", "highlight": "三只PE-TTM低于行业均值，茅台/泸州老窖源报分位偏低但区间未明，五粮液分位数据矛盾；估值仅作安全边际背景，不触发交易。"},
+      {"dimension": "风险收益比", "highlight": "下行尾部风险（政策、需求）可能大于上行，政策风险列为致命；满仓集中同质放大尾部，资金分配与止损规则空缺。"},
+      {"dimension": "替代选择", "highlight": "同赛道存在山西汾酒、洋河、白酒ETF等可部分覆盖板块beta的替代，但三只高端/次高端集中暴露不易完全替代；用户筛选标准未明。"}
+    ]
+  },
+  "presentation": {
+    "overall_confidence": "low",
+    "synthesis_read": "该想法在标的归属、可执行性和估值背景上有部分支撑，但核心均线收益假设与行情趋势均未验证，关键不确定性集中在策略有效性、行业因果传导和政策尾部风险，需补齐回测与实时行情后再作判断。"
+  }
+}
+
+## Skill D 输出（策略量化补全 + 网络经验参数）
+strategy_name: "白酒龙头20日均线趋势跟踪策略"
+source_idea: "用户假设贵州茅台、五粮液、泸州老窖在股价站上20日均线后平均收益优于跌破后，执行站上买入、跌破卖出、满仓操作。"
+
+can_quantify: true
+sector_level: false
+blocking_reason: ""
+required_inputs: []
+
+backtest_window:
+  start: "2023-05-22"
+  end: "2026-05-22"
+  alignment: "holding_period"
+  note: "想法为长期择时/持有型（均线趋势跟踪），禁用catalyst窗口。采用季度持有期滚动回测，窗口锚定行情数据最新交易日2026-05-22，近3年区间。"
+
+stock_pool:
+  primary: "贵州茅台、五粮液、泸州老窖"
+  alternatives: ["山西汾酒", "洋河股份", "古井贡酒"]
+  source: "user"
+  note: "用户明确指定三只白酒龙头；alternatives为同赛道替代标的，供对比参考。"
+
+buy_trigger:
+  condition: "个股收盘价（ADJCLOSEPRICE）上穿20日简单移动平均线时买入"
+  rationale: "用户明确指定站上20日均线买入"
+  source: "user"
+
+sell_trigger:
+  condition: "个股收盘价（ADJCLOSEPRICE）下穿20日简单移动平均线时卖出"
+  rationale: "用户明确指定跌破20日均线卖出"
+  source: "user"
+
+holding_period:
+  duration: "季度调仓，最长4期"
+  rebalance_freq: "季度"
+  source: "assumption"
+  rationale: "用户未给持有周期，采用中期策略默认季度调仓（仅权重再平衡，非信号检查节奏），最长4期。信号检查按每日进行。"
+
+signal_check_freq: "daily"
+
+position:
+  max_weight: "16.65%"
+  entry_batches: "4"
+  source: "assumption"
+  rationale: "用户明示满仓投资三只股票，推断等权各1/3（33.3%）；因B4政策风险致命及B1核心假设无验证触发保守模式，单票仓位减半为约16.7%。建仓批次由默认3次增加为4次（保守模式+1）。"
+
+risk_control:
+  stop_loss: "-10%"
+  take_profit: "+20%"
+  source: "assumption"
+  rationale: "用户未指定止损止盈，采用通用默认-15%/+20%；因保守模式触发，止损收紧为-10%，止盈维持+20%。"
+
+conservative_default: true
+conservative_reason: "B4 key_risk_drivers中政策风险（消费税、限制三公消费）severity为致命；B1 chain中前提→行业核心收益假设P1无历史回测验证，构成核心逻辑断点。触发保守默认。"
+conservative_override_note: "用户明示满仓（推断等权仓位33.3%），静默保守模式自动调整为单票16.7%（自动化流程，不向用户发起确认）。"
+
+branch_mode: true
+original_params:
+  position:
+    max_weight: "33.3%"
+    entry_batches: "3"
+  risk_control:
+    stop_loss: "-15%"
+    take_profit: "+20%"
+  note: "原策略=保守覆盖前的参数（忠实还原用户本意/系统默认非保守值）；信号与持有期与保守版一致，仅仓位与风控放开。供双回测对比参考。"
+
+assumptions:
+  - "用户未指定均线计算方式，采用收盘价（ADJCLOSEPRICE）20日简单移动平均线。"
+  - "用户明示满仓，推断为三只股票等权分配，单票仓位约33.3%。"
+  - "持有周期未指定，采用季度调仓（仅权重再平衡），最长4期。"
+  - "止损止盈未指定，采用通用默认-15%/+20%；保守模式止损收紧至-10%。"
+  - "web_experience无明确可用的单票仓位/止损止盈数值惯例，故相关参数回落到静态默认或用户推断。"
+  - "如需对比不同参数方案，可调整后重新回测。"
+
+## Skill E 输出
+### 回测代码
+"""
+策略名称：白酒龙头20日均线趋势跟踪策略
+回测说明：对贵州茅台、五粮液、泸州老窖及同赛道可比标的（山西汾酒、洋河股份、古井贡酒）分别执行个股级20日均线上下穿策略，独立信号、独立仓位与风控，组合净值汇总。
+假设前提：
+- 采用收盘价（ADJCLOSEPRICE）计算20日简单移动平均线（用户未指定，采用默认）。
+- 买入条件：个股收盘价上穿20日均线时买入（用户指定）。
+- 卖出条件：个股收盘价下穿20日均线时卖出（用户指定）。
+- 单票最大仓位：保守版16.65%（触发保守模式，满仓三票等权33.3%减半），原策略版33.3%（用户明示满仓推断等权）。
+- 建仓批次：保守版4批，原策略版3批（保守模式+1）。
+- 止损/止盈：保守版-10%/+20%，原策略版-15%/+20%（止盈来自默认，止损保守收紧）。
+- 持有周期：最长4期（约252个交易日），到期强制平仓。
+- 信号检查频率：每日（signal_check_freq=daily）。
+- 交易成本：佣金万2.5双边 + 印花税万5卖出 + 滑点万5双边。
+- 数据无成交量，未做流动性过滤。
+数据来源：data/hfq_clean.csv（个股复权日频），标的名称经 data/industry_clean.csv 映射为代码；基准来自 data/index_clean.csv（真实指数）或行业内等权篮子兜底。
+"""
+import pandas as pd
+import numpy as np
+import os
+
+# ========== 参数配置 ==========
+STOCK_POOL = ["贵州茅台", "五粮液", "泸州老窖", "山西汾酒", "洋河股份", "古井贡酒"]
+BUY_CONDITION = "个股收盘价上穿20日简单移动平均线"   # 用户指定
+SELL_CONDITION = "个股收盘价下穿20日简单移动平均线"   # 用户指定
+HOLDING_PERIOD = 252      # 交易日，来自 D.holding_period 最长4期（约4个季度）
+STOP_LOSS = -0.10         # 来自 D.risk_control.stop_loss（保守版）
+TAKE_PROFIT = 0.20        # 来自 D.risk_control.take_profit
+
+# 个股级单票仓位/分批（保守版）
+MAX_WEIGHT = 0.1665       # 单票最大仓位（组合初始资金占比）
+ENTRY_BATCHES = 4         # 单票分批建仓次数
+
+# 双分支回测：原策略参数（保守覆盖前）
+BRANCH_MODE = True
+ORIGINAL_MAX_WEIGHT = 0.333
+ORIGINAL_ENTRY_BATCHES = 3
+ORIGINAL_STOP_LOSS = -0.15
+ORIGINAL_TAKE_PROFIT = 0.20
+
+# 回测窗口：来自 D.backtest_window
+START_DATE = pd.to_datetime("2023-05-22")
+END_DATE = pd.to_datetime("2026-05-22")
+
+# 基准选择：优先用 data/index_clean.csv 中与想法板块匹配的真实指数；
+BENCHMARK_INDEX_CODE = None      # 手动指定指数 code；None 时按 SECTOR_HINT 子串匹配 index_name
+SECTOR_HINT = "白酒"             # 行业关键词
+INDEX_PATH = "data/index_clean.csv"
+
+# 交易成本：佣金万2.5双边 + 印花税万5卖出 + 滑点万5双边
+BUY_COST_RATE = 0.00025 + 0.0005      # 佣金 + 滑点
+SELL_COST_RATE = 0.00025 + 0.0005 + 0.0005  # 佣金 + 印花税 + 滑点
+
+# 涨跌停阈值（按 stock_code 前缀）：688/300/301→20%，8/4/92开头(北交所)→30%，其余→10%
+def _limit_threshold(code):
+    c = str(code)
+    if c.startswith(("688", "300", "301")): return 0.198
+    if c.startswith(("8", "4", "92")):      return 0.298
+    return 0.098
+
+# ========== 数据加载 ==========
+DATA_PATH = "data/hfq_clean.csv"
+MAP_PATH = "data/industry_clean.csv"
+FALLBACK_MAP_PATH = "data/stock_list_clean.csv"
+
+def _name_to_code():
+    ind = pd.read_csv(MAP_PATH, dtype={"stock_code": str})
+    ind["stock_code"] = ind["stock_code"].str.zfill(6)
+    m = dict(zip(ind["stock_name"], ind["stock_code"]))
+    try:
+        fb = pd.read_csv(FALLBACK_MAP_PATH, dtype={"stock_code": str})
+        fb["stock_code"] = fb["stock_code"].str.zfill(6)
+        for _, r in fb.iterrows():
+            m.setdefault(r["stock_name"], r["stock_code"])
+    except Exception:
+        pass
+    return m
+
+def load_data():
+    name2code = _name_to_code()
+    target_codes = []
+    for n in STOCK_POOL:
+        c = name2code.get(n)
+        if c:
+            target_codes.append(c)
+        else:
+            print(f"[WARN] 名称未映射到代码，跳过：{n}")
+    if not target_codes:
+        raise ValueError("STOCK_POOL 中没有任何名称能映射到 data/hfq_clean.csv 的代码")
+    target_codes = set(target_codes)
+
+    parts = []
+    for chunk in pd.read_csv(DATA_PATH, chunksize=500_000, dtype={"stock_code": str}):
+        chunk["stock_code"] = chunk["stock_code"].astype(str).str.zfill(6)
+        sub = chunk[chunk["stock_code"].isin(target_codes)]
+        if len(sub):
+            parts.append(sub)
+    if not parts:
+        raise ValueError("过滤后无数据，检查 STOCK_POOL 代码与 backtest_window 区间是否覆盖")
+    raw = pd.concat(parts, ignore_index=True)
+    raw["date"] = pd.to_datetime(raw["TRADINGDAY"], format="%Y/%m/%d")
+    # 只载入 close 口径列：open/high/low 复权口径与 close 不一致，不载入
+    df = raw[["date", "stock_code", "ADJCLOSEPRICE", "ADJPREVCLOSE", "pct_chg"]].copy()
+    df = df.rename(columns={"ADJCLOSEPRICE": "close", "ADJPREVCLOSE": "preclose"})
+    df = df.sort_values(["stock_code", "date"]).reset_index(drop=True)
+    df = df[(df["date"] >= START_DATE) & (df["date"] <= END_DATE)]
+    return df
+
+# ========== 基准加载（真实指数优先，行业等权篮子兜底） ==========
+def load_benchmark(df, strategy_dates):
+    strategy_dates = pd.DatetimeIndex(strategy_dates).sort_values()
+    if os.path.exists(INDEX_PATH):
+        idx = pd.read_csv(INDEX_PATH, dtype={"index_code": str})
+        if not idx.empty:
+            chosen = None
+            if BENCHMARK_INDEX_CODE:
+                sub = idx[idx["index_code"] == str(BENCHMARK_INDEX_CODE)]
+                if not sub.empty:
+                    chosen = sub
+            if chosen is None and SECTOR_HINT:
+                sub = idx[idx["index_name"].astype(str).str.contains(SECTOR_HINT, na=False)]
+                if not sub.empty:
+                    chosen = sub
+            if chosen is not None:
+                chosen = chosen.copy()
+                chosen["date"] = pd.to_datetime(chosen["TRADINGDAY"], format="%Y/%m/%d")
+                chosen = chosen[(chosen["date"] >= START_DATE) & (chosen["date"] <= END_DATE)]
+                chosen = chosen.dropna(subset=["date"]).sort_values("date").drop_duplicates("date")
+                chosen["ret"] = chosen["close"].pct_change().fillna(0)
+                bench = chosen.set_index("date")["ret"].reindex(strategy_dates, method="ffill").fillna(0)
+                bench_net = (1 + bench).cumprod()
+                bench_net = bench_net / bench_net.iloc[0]
+                name = str(chosen["index_name"].iloc[0])
+                print(f"[INFO] 基准=真实指数：{name} ({chosen['index_code'].iloc[0]})")
+                return bench_net, name
+    print("[INFO] 未匹配到真实指数，基准回退为行业内等权篮子（买入持有）")
+    d = df.copy()
+    d["ret"] = d["close"] / d["preclose"] - 1
+    daily = d.groupby("date")["ret"].mean().reindex(strategy_dates, method="ffill").fillna(0)
+    net = (1 + daily).cumprod()
+    net = net / net.iloc[0]
+    return net, "行业内等权篮子(买入持有)"
+
+# ========== 信号生成 ==========
+def generate_signals(df):
+    """
+    生成每只股票的20日均线上下穿信号。
+    返回：
+      signals: DataFrame，index=日期，columns=stock_code，值为信号（1=买入，-1=卖出，0=无）
+      stock_data: dict，key=stock_code，value=DataFrame(index=日期，包含 close_ret, pct_chg, hit_limit_up, hit_limit_down)
+    信号生成：T日收盘后判断是否上穿/下穿，信号用于T+1日执行。
+    """
+    df = df.copy()
+    df["close_ret"] = df["close"] / df["preclose"] - 1
+    df["limit_pct"] = df["stock_code"].apply(lambda c: _limit_threshold(c) * 100)
+    df["hit_limit_up"] = (df["pct_chg"] >= df["limit_pct"]).astype(int)
+    df["hit_limit_down"] = (df["pct_chg"] <= -df["limit_pct"]).astype(int)
+
+    # 获取所有交易日
+    all_dates = sorted(df["date"].unique())
+    all_dates = pd.DatetimeIndex(all_dates)
+
+    signals_list = {}
+    stock_data = {}
+
+    for code, group in df.groupby("stock_code"):
+        group = group.sort_values("date").set_index("date")
+        # 计算20日均线
+        group["ma20"] = group["close"].rolling(20).mean()
+        # 上穿：昨日收盘<=昨日均线，今日收盘>今日均线
+        up_cross = (group["close"] > group["ma20"]) & (group["close"].shift(1) <= group["ma20"].shift(1))
+        # 下穿：昨日收盘>=昨日均线，今日收盘<今日均线
+        down_cross = (group["close"] < group["ma20"]) & (group["close"].shift(1) >= group["ma20"].shift(1))
+        signal = pd.Series(0, index=group.index)
+        signal[up_cross] = 1
+        signal[down_cross] = -1
+        # 重索引到统一日期
+        signal = signal.reindex(all_dates, fill_value=0)
+        signals_list[code] = signal
+
+        # 保留每日必要数据
+        stock_data[code] = group[["close_ret", "pct_chg", "hit_limit_up", "hit_limit_down"]].reindex(all_dates, fill_value=0)
+
+    signals = pd.DataFrame(signals_list, index=all_dates)
+    # 填充 NaN 为 0
+    signals = signals.fillna(0).astype(int)
+    return signals, stock_data
+
+# ========== 回测执行 ==========
+def run_backtest(signals, stock_data, max_weight=MAX_WEIGHT, entry_batches=ENTRY_BATCHES,
+                 stop_loss=STOP_LOSS, take_profit=TAKE_PROFIT, holding_period=HOLDING_PERIOD):
+    """
+    多标的独立信号回测。
+    signals: DataFrame，index=date, columns=stock_code, values=signal (1买,-1卖,0无)
+    stock_data: dict of DataFrame，每只股票每日的 close_ret, pct_chg, hit_limit_up, hit_limit_down
+    初始资金 1,000,000，单票最大投入 = initial * max_weight，分 entry_batches 批建仓。
+    止损/止盈按单票净值（持仓市值 / 累计投入 - 1）判定；到期强制平仓。
+    """
+    codes = list(signals.columns)
+    # 初始化状态
+    initial = 1_000_000.0
+    cash = initial
+    positions = {code: 0.0 for code in codes}
+    entry_costs = {code: 0.0 for code in codes}
+    batches_done = {code: 0 for code in codes}
+    hold_days = {code: 0 for code in codes}
+    stop_pending = {code: False for code in codes}
+    take_profit_pending = {code: False for code in codes}
+    target_pos = initial * max_weight        # 单票目标投入
+    batch_size = target_pos / entry_batches  # 每批投入额
+
+    dates = signals.index
+    n = len(dates)
+    rows = []
+    trades = []
+
+    # 提前将 signals 向前移一行，表示 T-1 日信号（用于 T 日执行）
+    shifted_signals = signals.shift(1)
+
+    for i in range(n):
+        date = dates[i]
+        # 当日信号（来自 T-1 日）
+        prev_signal = shifted_signals.iloc[i] if i > 0 else pd.Series(0, index=signals.columns)
+
+        # 先处理卖出（强制卖出优先，再信号卖出）
+        for code in codes:
+            if positions[code] <= 0:
+                continue
+            # 获取当日该股数据
+            cdata = stock_data[code].loc[date]
+            close_ret = cdata["close_ret"]
+            # ① 更新持仓市值
+            positions[code] *= (1 + close_ret)
+            hold_days[code] += 1
+
+            # ② 强制出场（止损/止盈/到期）
+            if stop_pending[code] or take_profit_pending[code] or hold_days[code] > holding_period:
+                sell_amount = positions[code]
+                cash += sell_amount * (1 - SELL_COST_RATE)
+                positions[code] = 0.0
+                entry_costs[code] = 0.0
+                batches_done[code] = 0
+                hold_days[code] = 0
+                stop_pending[code] = False
+                take_profit_pending[code] = False
+                trades.append({"date": date, "action": "sell", "stock_code": code, "ret": close_ret})
+                continue
+
+            # ③ 信号卖出（下穿，且当日未跌停）
+            if prev_signal.get(code, 0) == -1:
+                if not bool(cdata["hit_limit_down"]):
+                    sell_amount = positions[code]
+                    cash += sell_amount * (1 - SELL_COST_RATE)
+                    positions[code] = 0.0
+                    entry_costs[code] = 0.0
+                    batches_done[code] = 0
+                    hold_days[code] = 0
+                    trades.append({"date": date, "action": "sell", "stock_code": code, "ret": close_ret})
+
+        # 再处理买入（信号买入，分批建仓）
+        for code in codes:
+            cdata = stock_data[code].loc[date]
+            if prev_signal.get(code, 0) == 1 and batches_done[code] < entry_batches and cash > 0:
+                # 当日未涨停才可买入
+                if not bool(cdata["hit_limit_up"]):
+                    invest = min(batch_size, cash)
+                    cash -= invest * (1 + BUY_COST_RATE)
+                    positions[code] += invest
+                    entry_costs[code] += invest
+                    batches_done[code] += 1
+                    if batches_done[code] == 1:  # 首次买入，开始计持有天数
+                        hold_days[code] = 1
+                    else:
+                        hold_days[code] = max(hold_days[code], 1)
+                    trades.append({"date": date, "action": "buy", "stock_code": code, "ret": cdata["close_ret"]})
+
+        # ④ 收盘后止损止盈检查（基于当前持仓）
+        for code in codes:
+            if positions[code] > 0 and entry_costs[code] > 0:
+                pnl = positions[code] / entry_costs[code] - 1
+                if pnl <= stop_loss:
+                    stop_pending[code] = True
+                elif take_profit is not None and pnl >= take_profit:
+                    take_profit_pending[code] = True
+
+        # ⑤ 记录总资产
+        total_value = cash + sum(positions.values())
+        rows.append({"date": date, "value": total_value})
+
+    equity_curve = pd.DataFrame(rows)
+    equity_curve["cum_return"] = equity_curve["value"] / initial
+    trades_df = pd.DataFrame(trades)
+    return equity_curve, trades_df
+
+# ========== 绩效分析 ==========
+def calculate_metrics(equity_curve, trades_df=None, bench_net=None,
+                      bench_name="无基准", risk_free_rate=0.02):
+    if equity_curve.empty or len(equity_curve) < 2:
+        return {"annual_return": np.nan, "max_drawdown": np.nan,
+                "sharpe": np.nan, "excess_return": np.nan,
+                "info_ratio": np.nan, "benchmark_name": bench_name}
+    v = equity_curve["value"].values
+    dates = equity_curve["date"]
+    total_ret = v[-1] / v[0] - 1
+    days = (dates.iloc[-1] - dates.iloc[0]).days
+    annual_return = (1 + total_ret) ** (365.0 / days) - 1 if days > 0 else np.nan
+    peak = np.maximum.accumulate(v)
+    max_drawdown = float(((peak - v) / peak).max())
+    daily_ret = equity_curve["value"].pct_change().fillna(0)
+    sharpe = (np.sqrt(252) * daily_ret.mean() / daily_ret.std()
+              if daily_ret.std() and len(daily_ret) >= 2 else np.nan)
+    info_ratio = np.nan
+    excess_return = np.nan
+    if bench_net is not None and len(bench_net) == len(equity_curve):
+        bench_daily = bench_net.pct_change().fillna(0).set_axis(equity_curve.index)
+        excess = (daily_ret - bench_daily).iloc[1:]
+        if len(excess) >= 2 and excess.std() > 0:
+            info_ratio = excess.mean() / excess.std() * np.sqrt(252)
+        strategy_net_last = equity_curve["value"].iloc[-1] / equity_curve["value"].iloc[0]
+        bench_last = bench_net.iloc[-1]
+        excess_return = strategy_net_last / bench_last - 1 if bench_last else np.nan
+    return {"annual_return": annual_return, "max_drawdown": max_drawdown,
+            "sharpe": sharpe, "excess_return": excess_return,
+            "info_ratio": info_ratio, "benchmark_name": bench_name}
+
+# ========== 可视化 ==========
+def plot_results(equity_curve, metrics, trades_df=None, bench_net=None,
+                 equity_orig=None, metrics_orig=None):
+    import matplotlib.pyplot as plt
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+    plt.rcParams['axes.unicode_minus'] = False
+    if equity_curve.empty:
+        print("[WARN] 无回测数据，跳过绘图")
+        return
+    v = equity_curve["value"].values
+    peak = np.maximum.accumulate(v)
+    drawdown = (peak - v) / peak
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    axes[0, 0].plot(equity_curve["date"], equity_curve["value"] / v[0], label="策略净值")
+    if bench_net is not None and len(bench_net) == len(equity_curve):
+        axes[0, 0].plot(equity_curve["date"], bench_net.values / bench_net.values[0],
+                         label="基准净值", linestyle="--", alpha=0.8)
+    if equity_orig is not None and len(equity_orig) == len(equity_curve):
+        axes[0, 0].plot(equity_curve["date"], equity_orig["value"].values / equity_orig["value"].iloc[0],
+                         label="原策略净值", linestyle=":", alpha=0.8)
+    axes[0, 0].set_title("净值曲线（策略 vs 基准）")
+    axes[0, 0].legend()
+    axes[0, 0].grid(alpha=0.3)
+    if trades_df is not None and not trades_df.empty:
+        buys = trades_df[trades_df["action"] == "buy"]
+        sells = trades_df[trades_df["action"] == "sell"]
+        axes[0, 0].scatter(buys["date"], [1] * len(buys), marker="^", color="green", s=80, label="买入")
+        axes[0, 0].scatter(sells["date"], [1] * len(sells), marker="v", color="red", s=80, label="卖出")
+        axes[0, 0].legend()
+    axes[0, 1].fill_between(equity_curve["date"], -drawdown, 0, color="red", alpha=0.3)
+    axes[0, 1].set_title("回撤曲线")
+    axes[0, 1].grid(alpha=0.3)
+    monthly = equity_curve.set_index("date")["value"].resample("ME").last().pct_change().dropna()
+    axes[1, 0].bar(range(len(monthly)), monthly.values, color="steelblue", alpha=0.7)
+    axes[1, 0].set_title("月度收益分布")
+    axes[1, 0].grid(alpha=0.3)
+    axes[1, 1].axis("off")
+    if metrics_orig is not None:
+        text = (f"【系统建议(保守)】\n年化: {metrics['annual_return']:.2%} 回撤: {metrics['max_drawdown']:.2%} 夏普: {metrics['sharpe']:.2f}\n"
+                f"超额: {metrics['excess_return']:.2%} 信息比: {metrics['info_ratio']:.2f}\n"
+                f"【原始意图】\n年化: {metrics_orig['annual_return']:.2%} 回撤: {metrics_orig['max_drawdown']:.2%} 夏普: {metrics_orig['sharpe']:.2f}\n"
+                f"超额: {metrics_orig['excess_return']:.2%} 信息比: {metrics_orig['info_ratio']:.2f}\n"
+                f"基准: {metrics['benchmark_name']}")
+    else:
+        text = (f"年化收益: {metrics['annual_return']:.2%}\n最大回撤: {metrics['max_drawdown']:.2%}\n"
+                f"夏普比率: {metrics['sharpe']:.2f}\n超额收益: {metrics['excess_return']:.2%}\n"
+                f"信息比率: {metrics['info_ratio']:.2f}\n基准: {metrics['benchmark_name']}")
+    axes[1, 1].text(0.5, 0.5, text, transform=axes[1, 1].transAxes, ha="center", va="center",
+                    fontsize=12, bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5))
+    plt.tight_layout()
+    out_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.makedirs(out_dir, exist_ok=True)
+    plt.savefig(os.path.join(out_dir, "backtest_plot.png"), dpi=150)
+    plt.close()
+
+if __name__ == "__main__":
+    # 1. 数据加载
+    df = load_data()
+    print(f"[INFO] 加载数据行数：{len(df)}")
+    # 2. 信号生成
+    signals, stock_data = generate_signals(df)
+    print(f"[INFO] 信号日期范围：{signals.index.min()} 至 {signals.index.max()}")
+    # 3. 基准加载
+    bench_net, bench_name = load_benchmark(df, signals.index)
+    bench_align = bench_net.reindex(signals.index).ffill().fillna(1.0)
+
+    # 4. 回测函数封装
+    def _run_and_report(label, mw, eb, sl, tp, hp):
+        eq, tr = run_backtest(signals, stock_data, max_weight=mw, entry_batches=eb,
+                              stop_loss=sl, take_profit=tp, holding_period=hp)
+        m = calculate_metrics(eq, tr, bench_net=bench_align, bench_name=bench_name)
+        print(f"=== 回测结果（{label}）===")
+        print(f"年化收益: {m['annual_return']:.2%}")
+        print(f"最大回撤: {m['max_drawdown']:.2%}")
+        print(f"夏普比率: {m['sharpe']:.2f}")
+        print(f"超额收益: {m['excess_return']:.2%}")
+        print(f"信息比率: {m['info_ratio']}")
+        print(f"基准: {m['benchmark_name']}")
+        print(f"交易次数: {len(tr)}")
+        print(f"策略末期净值: {eq['value'].iloc[-1]/eq['value'].iloc[0]:.3f}")
+        print(f"基准末期净值: {bench_align.iloc[-1]:.3f}")
+        return eq, tr, m
+
+    # 保守版
+    equity_cons, trades_cons, metrics_cons = _run_and_report(
+        "系统建议(保守)", MAX_WEIGHT, ENTRY_BATCHES, STOP_LOSS, TAKE_PROFIT, HOLDING_PERIOD)
+
+    # 原策略版
+    equity_orig = trades_orig = metrics_orig = None
+    if BRANCH_MODE:
+        equity_orig, trades_orig, metrics_orig = _run_and_report(
+            "原始意图", ORIGINAL_MAX_WEIGHT, ORIGINAL_ENTRY_BATCHES,
+            ORIGINAL_STOP_LOSS, ORIGINAL_TAKE_PROFIT, HOLDING_PERIOD)
+        cons_ex = metrics_cons.get("excess_return")
+        orig_ex = metrics_orig.get("excess_return")
+        if cons_ex is not None and orig_ex is not None and not (pd.isna(cons_ex) or pd.isna(orig_ex)):
+            print(f"[INFO] 保守模式拖累(超额收益差)= 保守超额 {cons_ex:.2%} - 原策略超额 {orig_ex:.2%} = {cons_ex - orig_ex:.2%}")
+
+    # 5. 绘图
+    plot_results(equity_cons, metrics_cons, trades_cons, bench_net=bench_align,
+                 equity_orig=equity_orig, metrics_orig=metrics_orig)
+
+### 回测结果
+[INFO] 加载数据行数：4362
+[INFO] 信号日期范围：2023-05-22 00:00:00 至 2026-05-22 00:00:00
+[INFO] 基准=真实指数：中证白酒 (399997)
+=== 回测结果（系统建议(保守)）===
+年化收益: -0.01%
+最大回撤: 5.53%
+夏普比率: 0.02
+超额收益: 116.26%
+信息比率: 0.9505726316760245
+基准: 中证白酒
+交易次数: 438
+策略末期净值: 1.000
+基准末期净值: 0.462
+=== 回测结果（原始意图）===
+年化收益: -0.03%
+最大回撤: 13.50%
+夏普比率: 0.05
+超额收益: 116.14%
+信息比率: 1.1041969456593452
+基准: 中证白酒
+交易次数: 438
+策略末期净值: 0.999
+基准末期净值: 0.462
+[INFO] 保守模式拖累(超额收益差)= 保守超额 116.26% - 原策略超额 116.14% = 0.12%
+
